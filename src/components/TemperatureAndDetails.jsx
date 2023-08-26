@@ -8,7 +8,7 @@ import {
   UilSun,
   UilSunset,
 } from "@iconscout/react-unicons";
-import { formatToLocalTime, iconUrlFromCode } from "../services/weatherService";
+import { iconUrlFromCode } from "../services/weatherService";
 
 function TemperatureAndDetails({
   weather: {
@@ -22,7 +22,6 @@ function TemperatureAndDetails({
     speed,
     humidity,
     feels_like,
-    timezone,
   },
 }) {
   return (
