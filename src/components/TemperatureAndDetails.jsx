@@ -12,8 +12,7 @@ import { iconUrlFromCode } from "../services/weatherService";
 
 function TemperatureAndDetails({
   weather: {
-    details,
-    icon,
+    weather,
     temp,
     temp_min,
     temp_max,
@@ -27,10 +26,10 @@ function TemperatureAndDetails({
   return (
     <div>
       <div className="flex items-center justify-center py-6 text-xl text-cyan-300">
-        {details}
+        {`${weather[0].main}`}
       </div>
       <div className="flex flex-row items-center justify-between text-white py-3">
-        <img src={iconUrlFromCode(icon)} alt="" className="w-20" />
+        <img src={iconUrlFromCode(weather[0].icon)} alt="" className="w-20" />
         <p className="text-5xl">{`${temp.toFixed()}°`}</p>
         <div className="flex flex-col space-y-2">
           <div className="flex font-light text-sm items-center justify-center">
