@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 
-// const API_KEY = "9442ad1d717c46ef58dccc1542339f80";
-const API_KEY = "ef6ad2690f80d027b7798b316e905386";
+// mock data
+const API_KEY = "9442ad1d717c46ef58dccc1542339f80";
 const BASE_URL = "https://api.openweathermap.org/data/2.5";
 
 const getWeatherData = async (infoType, searchParams) => {
@@ -44,14 +44,28 @@ const formatCurrentWeather = (data) => {
 };
 
 const formatForecastWeather = (data) => {
-  let { list } = data;
-  list = list.slice(1, 6).map((d) => {
-    return {
-      title: formatToLocalTime(d.dt, "ccc"),
-      temp: d.temp.day,
-      icon: d.weather[0].icon,
-    };
-  });
+  if (!data || !data.list || data.list.length === 0) {
+    console.error("Invalid forecast data received");
+    return { list: [] };
+  }
+
+  const dailyData = data.list.reduce((acc, curr) => {
+    const currentDate = DateTime.fromSeconds(curr.dt).toISODate();
+    if (
+      !acc.some(
+        (item) => DateTime.fromSeconds(item.dt).toISODate() === currentDate,
+      )
+    ) {
+      acc.push(curr);
+    }
+    return acc;
+  }, []);
+
+  const list = dailyData.map((d) => ({
+    title: formatToLocalTime(d.dt, "ccc"),
+    temp: d.main.temp,
+    icon: d.weather?.[0]?.icon || "",
+  }));
 
   return { list };
 };
@@ -59,7 +73,7 @@ const formatForecastWeather = (data) => {
 const getFormattedWeatherData = async (searchParams) => {
   const formattedCurrentWeather = await getWeatherData(
     "weather",
-    searchParams
+    searchParams,
   ).then(formatCurrentWeather);
 
   const { lat, lon } = formattedCurrentWeather;
@@ -77,7 +91,7 @@ const getFormattedWeatherData = async (searchParams) => {
 
 const formatToLocalTime = (
   secs,
-  format = "cccc, dd LLL yyyy' | Local time: 'hh:mm a"
+  format = "cccc, dd LLL yyyy' | Local time: 'hh:mm a",
 ) => DateTime.fromSeconds(secs).toFormat(format);
 
 const iconUrlFromCode = (code) =>
